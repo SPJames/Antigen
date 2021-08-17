@@ -1,5 +1,3 @@
-import { RouterLogic } from "../utils/router-logic";
-
 class NavBar extends HTMLElement {
     template = `
         <style>
@@ -43,22 +41,20 @@ class NavBar extends HTMLElement {
             }
         </style>
         <nav>
-            <a href="#" data-url="/">Home</a>
+            <nav-link url="/" text="Home"></nav-link>
             <a href="#" data-collapse="projects">Projects</a>
             <div data-collapse="projects">
-                <a href="#" data-url="/personal">Personal</a>
-                <a href="#" data-url="/professional">Professional</a>
+                <nav-link url="/personal" text="Personal"></nav-link>
+                <nav-link url="/professional" text="Professional"></nav-link>
             </div>
-            <a href="#" data-url="/resume">Resume</a>
-            <a href="#" data-url="/contact">Contact</a>
+            <nav-link url="/resume" text="Resume"></nav-link>
+            <nav-link url="/contact" text="Contact"></nav-link>
             <button>menu</button>
         </nav>
         <button id="hamburger">menu</button>
     `;
-    routerLogic: RouterLogic = null;
     constructor() {
         super();
-        this.routerLogic = new RouterLogic();
         this.attachShadow({mode: 'open'});
         const node = document.createElement('template');
         node.innerHTML = this.template;
@@ -66,11 +62,8 @@ class NavBar extends HTMLElement {
     }
 
     connectedCallback() {
-        this.shadowRoot.querySelectorAll('a[data-url]').forEach(node => {
-            node.addEventListener('click', (e: any) => {
-                this.routerLogic.navigate(e?.path[0]?.dataset?.url);
-                this.toggleNav();
-            });
+        this.shadowRoot.querySelectorAll('nav-link').forEach(node => {
+            node.addEventListener('click', this.toggleNav);
         });
         this.shadowRoot.querySelectorAll('a[data-collapse]').forEach(node => {
             node.addEventListener('click', (e: any) => {
@@ -84,10 +77,7 @@ class NavBar extends HTMLElement {
 
     disconnectedCallback() {
         this.shadowRoot.querySelectorAll('a[data-url]').forEach(node => {
-            node.removeEventListener('click', (e: any) => {
-                this.routerLogic.navigate(e?.path[0]?.dataset?.url);
-                this.toggleNav();
-            });
+            node.removeEventListener('click', this.toggleNav);
         });
         this.shadowRoot.querySelectorAll('a[data-collapse]').forEach(node => {
             node.removeEventListener('click', (e: any) => {
