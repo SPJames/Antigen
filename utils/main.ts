@@ -1,6 +1,8 @@
-import {routerLogic} from "./router-logic.js";
+import Route from "./route";
+import { RouterLogic } from "./router-logic";
+const routerLogic: RouterLogic = new RouterLogic();
 
-const routes = [
+const routes: Route[] = [
     {
         name: 'home',
         path: '/',

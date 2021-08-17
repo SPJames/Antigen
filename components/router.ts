@@ -1,8 +1,10 @@
-import { routerLogic } from "../utils/router-logic.js";
+import { RouterLogic } from "../utils/router-logic";
 
 class RouterOutlet extends HTMLElement {
+    routerLogic: RouterLogic = null;
     constructor() {
         super();
+        this.routerLogic = new RouterLogic();
     }
 
     connectedCallback() {
@@ -14,12 +16,12 @@ class RouterOutlet extends HTMLElement {
     }
 
     _handlePopstate = () => {
-        const page = routerLogic.setActivePage(window.location.pathname);
-        if (page) {
-            this.innerHTML = page.content;
+        let page = this.routerLogic.setActivePage(window.location.pathname);
+        if (!page) {
+           page = this.routerLogic.setActivePage('/404');
         }
+        this.innerHTML = page.content;
     }
-    
 }
 
 window.customElements.define('router-outlet', RouterOutlet);

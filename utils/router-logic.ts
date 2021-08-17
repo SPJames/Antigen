@@ -1,39 +1,56 @@
+import Route from "./route";
+
+let instance: RouterLogic;
+
 class RouterLogic {
 
-    pages = [];
-    activePage = null;
+    constructor() {
+        if (!instance) {
+            instance = this;
+        }
+        return instance;
+    }
 
-    async loadPage(pageName) {
+    pages: Route[] = [];
+    activePage: Route = null;
+    id = Math.random();
+
+    async loadPage(pageName: string) {
         const res = await fetch(pageName);
         const html = await res.text();
         return html;
     }
 
-    async loadAllPages() {
+    async loadAllPages(): Promise<void> {
+        const routerOutlet = document.querySelector('router-outlet');
         for(const page of this.pages) {
             page.content = await this.loadPage(page.file);
             if (page.path === window.location.pathname) {
-                document.querySelector('router-outlet').innerHTML = page.content;
+                routerOutlet.innerHTML = page.content;
             }
+        }
+        if (routerOutlet.innerHTML == '') {
+            this.setActivePage('/404');
+            routerOutlet.innerHTML = this.getActivePage()?.content;
         }
     }
 
-    addPages(routes) {
+    addPages(routes: Route[]): void {
         routes.forEach(route => {
             this.pages.push({name: route.name, file: route.file, path: route.path, content: ''});
         });
     }
 
-    getActivePage() {
+    getActivePage(): Route {
         return this.activePage;
     }
 
-    setActivePage(path) {
+    setActivePage(path: string): Route {
         this.activePage = this.pages.find(p => p.path === path) ?? null;
         return this.activePage;
     }
 
-    navigate(url) {
+    navigate(url: string): void {
         if(!url) {
             window.history.pushState({}, '/404', window.location.origin + '/404');
             return;
@@ -41,8 +58,4 @@ class RouterLogic {
         window.history.pushState({}, url, window.location.origin + url);
     }
 }
-
-// Singleton
-const routerLogic = new RouterLogic();
-
-export {routerLogic};
+export { RouterLogic };
